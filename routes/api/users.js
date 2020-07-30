@@ -71,9 +71,6 @@ router.post('/', [
             if(err) throw err;
             res.json({token})
     });
-    
-    // console.log(req.body);
-    // res.send('User Registered');
 
     } catch (err) {
         console.error(err.message);
