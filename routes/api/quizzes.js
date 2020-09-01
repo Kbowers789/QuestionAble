@@ -4,7 +4,6 @@ const auth = require('../../middleware/auth');
 const quiz = require('../../models/Quiz');
 const user = require('../../models/User');
 const { check, validationResult } = require('express-validator');
-const Quiz = require('../../models/Quiz');
 
 
 // @route   GET api/quizzes/myQuizzes
@@ -49,11 +48,11 @@ router.post('/', [auth, [
     if(useFromBank) quizFields.useFromBank = useFromBank;
 
     try {
-        let thisQuiz = await Quiz.findOne({user: req.user.id, name: name});
+        let thisQuiz = await quiz.findOne({user: req.user.id, name: name});
 
         if (thisQuiz) {
             // Updating existing quiz
-            thisQuiz = await Quiz.findOneAndUpdate({ user: req.user.id, name: name}, { $set: quizFields}, {new: true});
+            thisQuiz = await quiz.findOneAndUpdate({ user: req.user.id, name: name}, { $set: quizFields}, {new: true});
 
             return res.json(thisQuiz)
         };
