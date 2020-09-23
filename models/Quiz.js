@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+mongoose.set('useFindAndModify', false);
 
 const QuizSchema = new mongoose.Schema({
     name: {
@@ -27,4 +28,4 @@ const QuizSchema = new mongoose.Schema({
     }
 });
 
-module.exports = User = mongoose.model('quiz', QuizSchema);
+module.exports = Quiz = mongoose.model('quiz', QuizSchema);

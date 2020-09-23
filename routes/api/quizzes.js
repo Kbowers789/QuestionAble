@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../../middleware/auth');
-const quiz = require('../../models/Quiz');
+const Quiz = require('../../models/Quiz');
 const user = require('../../models/User');
 const { check, validationResult } = require('express-validator');
 
@@ -11,7 +11,7 @@ const { check, validationResult } = require('express-validator');
 // @access  Private
 router.get('/myQuizzes', auth, async (req, res) => {
     try {
-        const quizzes = await quiz.find({owner: req.user.id}).populate('user', ['name', 'email', 'date']);
+        const quizzes = await Quiz.find({owner: req.user.id}).populate('user', ['name', 'email', 'date']);
         if(quizzes.length === 0){
             return res.json({msg: 'user has no quizzes.'})
         }
@@ -35,7 +35,7 @@ router.post('/', [auth, [
         return res.status(400).json({errors: errors.array()});
     }
 
-    const {name, owner, notify, randomize, bank, useFromBank} = req.body;
+    const {name, notify, randomize, bank, useFromBank} = req.body;
 
     // Building a quiz object
     const quizFields = {};
@@ -48,19 +48,19 @@ router.post('/', [auth, [
     if(useFromBank) quizFields.useFromBank = useFromBank;
 
     try {
-        let thisQuiz = await quiz.findOne({user: req.user.id, name: name});
+        let thisQuiz = await Quiz.findOne({owner: req.user.id, name: name}).populate('user', ['name', 'email', 'date']);
 
         if (thisQuiz) {
             // Updating existing quiz
-            thisQuiz = await quiz.findOneAndUpdate({ user: req.user.id, name: name}, { $set: quizFields}, {new: true});
+            thisQuiz = await Quiz.findOneAndUpdate({ owner: req.user.id, name: name}, { $set: quizFields}, {new: true});
 
-            return res.json(thisQuiz)
+            return res.json({msg: 'quiz successfully updated'})
+        } else {
+            // Creating a new quiz
+            thisQuiz = new Quiz(quizFields);
+            await thisQuiz.save();
+            res.json(thisQuiz);    
         };
-
-        // Creating a new quiz
-        thisQuiz = new Quiz(quizFields);
-        await thisQuiz.save();
-        res.json(thisQuiz);
 
     } catch(err) {
         console.error(err.message);

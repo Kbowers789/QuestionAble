@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+mongoose.set('useFindAndModify', false);
 
 const QuestionSchema = new mongoose.Schema({
     quiz: {
